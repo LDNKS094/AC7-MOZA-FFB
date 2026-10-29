@@ -1,0 +1,43 @@
+# Local research, verification, plans, history and intermediate builds.
+/development/
+/releases/
+**/build/
+**/bin/
+**/obj/
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Runtime output.
+AC7RumbleTrace.csv
+rumblelog-*.csv
+*.log
+
+# Agent state, caches and editor settings.
+/.pi/
+/.context-mode/
+.context-mode*
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-*
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.vs/
+.vscode/
+.idea/
+CMakeUserPresets.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.DS_Store
+Thumbs.db
+
+.env
+.env.*
+!.env.example
+!.env.sample
