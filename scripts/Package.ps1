@@ -17,12 +17,6 @@ try {
     foreach ($name in @('Install.ps1', 'Uninstall.ps1', 'Common.ps1')) {
         Copy-Item (Join-Path $PSScriptRoot $name) $scripts.FullName
     }
-    if (Test-Path -LiteralPath (Join-Path $root 'optional-logging')) {
-        $logging = New-Item -ItemType Directory -Path (Join-Path $stage 'optional-logging')
-        foreach ($name in @('AC7RumbleLog.exe', 'AC7IcingObserver.asi', 'README.md')) {
-            Copy-Item (Join-Path $root ('optional-logging\' + $name)) $logging.FullName
-        }
-    }
     Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip
     (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + (Split-Path -Leaf $zip) | Set-Content "$zip.sha256" -Encoding ASCII
     Write-Output "Packaged: $zip"

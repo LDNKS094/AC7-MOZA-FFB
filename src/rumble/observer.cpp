@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
+#include <string>
 #include "MinHook.h"
 #include "preview.hpp"
 #include "native_input.hpp"
@@ -77,7 +79,12 @@ struct Target {
 static DWORD WINAPI Start(void*) {
     auto* base = reinterpret_cast<std::uint8_t*>(GetModuleHandleW(nullptr));
     const auto image_base = reinterpret_cast<std::uintptr_t>(base);
-    preview.Initialize(PublishRawRumble); // Dedicated raw channel; no device ownership or output calls.
+    std::wstring executable(32768, L'\0');
+    const DWORD length = GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
+    if (!length || length >= executable.size()) return 1;
+    executable.resize(length);
+    const auto settings = std::filesystem::path(executable).parent_path() / L"RumbleSettings.ini";
+    preview.Initialize(PublishRawRumble, ac7::LoadRumbleGains(settings.c_str()));
     const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     const auto* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(base + dos->e_lfanew);
     if (pe->FileHeader.TimeDateStamp != 1667396750 ||

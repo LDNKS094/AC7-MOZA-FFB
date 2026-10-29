@@ -1,6 +1,7 @@
 # Local research, verification, plans, history and intermediate builds.
 /development/
 /releases/
+/payload/
 **/build/
 **/bin/
 **/obj/
@@ -8,6 +9,8 @@
 *.ilk
 *.exp
 *.lib
+*.exe
+*.asi
 
 # Runtime output.
 AC7RumbleTrace.csv

@@ -46,7 +46,7 @@ ACE COMBAT 7/
 2. 连接外设启动一次游戏再退出，让游戏生成外设绑定配置文件。
 3. 运行 `Install.cmd`。
 
-脚本会自动查找游戏目录与预设库，复制 ASI、Lua 与 Cockpit 预设，合并模组列表。匹配到 AB6/MTQ 时会自动备份 `Input.ini` 后写入对应绑定；其他设备型号则需要自行编辑，参考[按键绑定](#按键绑定)。
+脚本会自动查找游戏目录与预设库，复制 ASI、ini、Lua 与 Cockpit 预设，合并模组列表。匹配到 AB6/MTQ 时会自动备份 `Input.ini` 后写入对应绑定；其他设备型号则需要自行编辑，参考[按键绑定](#按键绑定)。
 
 找不到游戏时指定目录：
 
@@ -56,7 +56,7 @@ ACE COMBAT 7/
 
 ### 脚本卸载
 
-运行 `Uninstall.cmd` 将自动移除本补丁直接添加的模组文件、模组列表条目及 Cockpit 预设；外设绑定配置不会自动移除。
+运行 `Uninstall.cmd` 将自动移除本补丁直接添加的模组文件、震动配置、模组列表条目及 Cockpit 预设；外设绑定配置不会自动移除。
 
 需要指定目录时：
 
@@ -73,7 +73,8 @@ ACE COMBAT 7/
    | 本包文件 | 复制到 |
    | --- | --- |
    | `payload/AC7RumbleTrace.asi` | 游戏根目录 |
-   | `payload/AC7NativeInput.asi` | 游戏根目录 |
+   | `payload/AC7ExpandedInput.asi` | 游戏根目录 |
+   | `presets/RumbleSettings.ini` | 游戏根目录 |
    | `mod/AC7Telemetry/` | `ue4ss/Mods/AC7Telemetry/` |
 
 4. 在 `ue4ss/Mods/mods.txt` 中添加：
@@ -122,7 +123,8 @@ ACE COMBAT 7/
 删除以下文件与目录：
 
 - `AC7RumbleTrace.asi`
-- `AC7NativeInput.asi`
+- `AC7ExpandedInput.asi`
+- `RumbleSettings.ini`
 - `ue4ss/Mods/AC7Telemetry/`
 
 再从 `ue4ss/Mods/mods.txt` 与 `ue4ss/Mods/mods.json` 中删除 `AC7Telemetry` 条目。
@@ -135,6 +137,10 @@ ACE COMBAT 7/
 
 1. 打开 Cockpit，运行项目根目录的 `DCS.exe`（桥接程序）；Cockpit 会自动识别并建立连接。若安装时 Cockpit 已在运行，需要重启它以读取新写入的预设。
 2. 启动游戏。
+
+## 震动设置
+
+参考 `RumbleSettings.ini` 内部注释进行编辑。修改后需重启游戏。
 
 ## 按键绑定
 
@@ -172,7 +178,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Build.ps1
 DCS.exe
 payload/
   AC7RumbleTrace.asi
-  AC7NativeInput.asi
+  AC7ExpandedInput.asi
 ```
 
 编译后即可按照常规安装方式使用。

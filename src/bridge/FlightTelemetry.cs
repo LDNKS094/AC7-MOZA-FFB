@@ -14,7 +14,7 @@ sealed class FlightTelemetry {
   public string Frame(Sample s) {
     if (!s.valid || s.paused) {
       prev = null;
-      if (s.paused) { gSmooth = 1; axSmooth = azSmooth = pv = yv = rv = 0; }
+      gSmooth = 1; axSmooth = azSmooth = pv = yv = rv = 0;
       return PausedFrame();
     }
     if (prev != null && s.t > prev.t + 1e-4) {

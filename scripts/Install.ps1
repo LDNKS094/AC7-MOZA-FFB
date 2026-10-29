@@ -11,10 +11,12 @@ $mods = Join-Path $game 'ue4ss\Mods'
 $lists = Get-ModLists $mods $true
 $files = [ordered]@{
     'AC7RumbleTrace.asi' = (Join-Path $ProjectRoot 'payload\AC7RumbleTrace.asi')
-    'AC7NativeInput.asi' = (Join-Path $ProjectRoot 'payload\AC7NativeInput.asi')
+    'AC7ExpandedInput.asi' = (Join-Path $ProjectRoot 'payload\AC7ExpandedInput.asi')
     'ue4ss\Mods\AC7Telemetry\Scripts\main.lua' = (Join-Path $ProjectRoot 'mod\AC7Telemetry\Scripts\main.lua')
 }
 $inputSource = Join-Path $ProjectRoot 'presets\input\Input.ini'
+$rumbleSource = Join-Path $ProjectRoot 'presets\RumbleSettings.ini'
+$rumblePath = Join-Path $game 'RumbleSettings.ini'
 $inputPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'BANDAI NAMCO Entertainment\ACE COMBAT 7\Config\Input.ini'
 if (-not (Test-Path -LiteralPath $inputPath -PathType Leaf)) {
     throw 'Input.ini not found. Connect your controllers, start AC7 once, then exit before installing.'
@@ -58,7 +60,7 @@ function Merge-InputBindings([string]$Text, [string]$Template) {
     }
     return [pscustomobject]@{Text = $Text; Devices = @($devices | ForEach-Object { $_.Groups['section'].Value })}
 }
-foreach ($source in @($files.Values) + @($inputSource)) {
+foreach ($source in @($files.Values) + @($inputSource, $rumbleSource)) {
     if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Missing package file: $source" }
 }
 $inputBindings = Merge-InputBindings ([IO.File]::ReadAllText($inputPath)) ([IO.File]::ReadAllText($inputSource))
@@ -87,7 +89,7 @@ $entry = [pscustomobject]@{date = $preset.date; device_type = $preset.device_typ
 $index.presets = @($index.presets | Where-Object { $_.uuid -ne $preset.uuid }) + @($entry)
 $indexJson = $index | ConvertTo-Json -Depth 30
 $matchJson = $match | ConvertTo-Json -Depth 30
-if (-not $PSCmdlet.ShouldProcess($game, 'Overwrite AC7-MOZA-FFB game components and AC7 Default preset; back up and update known input bindings')) { return }
+if (-not $PSCmdlet.ShouldProcess($game, 'Overwrite AC7-MOZA-FFB game components and AC7 Default preset; install missing rumble settings; back up and update known input bindings')) { return }
 if ($inputBindings.Devices.Count -gt 0) {
     $inputBackup = $inputPath + '.' + (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff') + '.bak'
     [IO.File]::Copy($inputPath, $inputBackup)
@@ -99,13 +101,16 @@ foreach ($relative in $files.Keys) {
     New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
     Copy-Item -LiteralPath $files[$relative] -Destination $target -Force
 }
+if (-not (Test-Path -LiteralPath $rumblePath)) {
+    Copy-Item -LiteralPath $rumbleSource -Destination $rumblePath
+}
 Write-Utf8 (Join-Path $mods 'mods.txt') $lists.Text
 Write-Utf8 (Join-Path $mods 'mods.json') $lists.Json
 Copy-Item -LiteralPath $source -Destination $destination -Force
 Write-Utf8 $indexPath $indexJson
 Write-Utf8 $matchPath $matchJson
 Write-Output "Installed to: $game"
-Write-Output 'Project files and AC7 Default were overwritten without backups. Other mods and other presets were preserved.'
+Write-Output 'ASI plugins, telemetry script and AC7 Default were overwritten without backups. Existing RumbleSettings.ini, other mods and other presets were preserved.'
 if ($inputBindings.Devices.Count -gt 0) {
     Write-Output "Updated input bindings in: $inputPath"
     Write-Output ('Matched device sections: ' + ($inputBindings.Devices -join ', '))

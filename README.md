@@ -46,7 +46,7 @@ ACE COMBAT 7/
 2. Connect your peripherals, start the game once, then exit to let it create the input configuration.
 3. Run `Install.cmd`.
 
-The script locates the game folder and preset library, copies the ASI plugins, Lua script and Cockpit preset, and updates the mod lists. If it finds an AB6 or MTQ, it backs up `Input.ini` and applies the matching bindings. For other devices, edit the bindings yourself; see [Key bindings](#key-bindings).
+The script locates the game folder and preset library, copies the ASI plugins, ini file, Lua script and Cockpit preset, and updates the mod lists. If it finds an AB6 or MTQ, it backs up `Input.ini` and applies the matching bindings. For other devices, edit the bindings yourself; see [Key bindings](#key-bindings).
 
 If the game is not found, pass the folder:
 
@@ -56,7 +56,7 @@ If the game is not found, pass the folder:
 
 ### Script uninstall
 
-`Uninstall.cmd` removes the files added by this patch, its mod-list entries and the Cockpit preset; the input configuration is left untouched.
+`Uninstall.cmd` removes the files added by this patch, the rumble settings, its mod-list entries and the Cockpit preset; the input configuration is left untouched.
 
 To specify the folder:
 
@@ -73,7 +73,8 @@ To specify the folder:
    | File in this package | Copy to |
    | --- | --- |
    | `payload/AC7RumbleTrace.asi` | Game root |
-   | `payload/AC7NativeInput.asi` | Game root |
+   | `payload/AC7ExpandedInput.asi` | Game root |
+   | `presets/RumbleSettings.ini` | Game root |
    | `mod/AC7Telemetry/` | `ue4ss/Mods/AC7Telemetry/` |
 
 4. Add this to `ue4ss/Mods/mods.txt`:
@@ -122,7 +123,8 @@ To specify the folder:
 Delete these files and folders:
 
 - `AC7RumbleTrace.asi`
-- `AC7NativeInput.asi`
+- `AC7ExpandedInput.asi`
+- `RumbleSettings.ini`
 - `ue4ss/Mods/AC7Telemetry/`
 
 Then remove the `AC7Telemetry` entries from `ue4ss/Mods/mods.txt` and `ue4ss/Mods/mods.json`.
@@ -135,6 +137,10 @@ The dependencies do not need to be removed if other mods still use them.
 
 1. Open Cockpit and run `DCS.exe` in the project folder (the bridge); Cockpit automatically detects the DCS process and connects. If Cockpit was already running during installation, restart it to load the new preset.
 2. Start the game.
+
+## Rumble settings
+
+Edit `RumbleSettings.ini` by following the comments inside the file. Restart the game after editing.
 
 ## Key bindings
 
@@ -172,7 +178,7 @@ Output:
 DCS.exe
 payload/
   AC7RumbleTrace.asi
-  AC7NativeInput.asi
+  AC7ExpandedInput.asi
 ```
 
 Once built, install the patch as usual.

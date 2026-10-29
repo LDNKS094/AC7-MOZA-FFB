@@ -47,12 +47,13 @@ std::optional<ac7::AfterburnerInput> ReadAfterburner(std::uintptr_t object) {
 }
 
 namespace ac7 {
-void RumblePreview::Initialize(PreviewOutput output) {
+void RumblePreview::Initialize(PreviewOutput output, const RumbleGains& gains) {
     output_ = output;
     LARGE_INTEGER counter{};
     QueryPerformanceCounter(&counter);
     const auto entropy = static_cast<std::uint64_t>(counter.QuadPart);
     playback_ = RumblePlayback(static_cast<std::uint32_t>(entropy ^ (entropy >> 32)) ^ GetCurrentProcessId());
+    playback_.SetGains(gains);
     playback_.EndResume();
 }
 bool RumblePreview::OwnThread() {

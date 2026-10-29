@@ -13,7 +13,7 @@ add_library(minhook STATIC
     "${MINHOOK}/src/buffer.c" "${MINHOOK}/src/hook.c"
     "${MINHOOK}/src/trampoline.c" "${MINHOOK}/src/hde/hde64.c")
 target_include_directories(minhook PUBLIC "${MINHOOK}/include")
-add_library(AC7RumbleTrace SHARED observer.cpp preview.cpp native_input.cpp raw_channel.cpp playback.cpp)
+add_library(AC7RumbleTrace SHARED observer.cpp preview.cpp native_input.cpp raw_channel.cpp playback.cpp settings.cpp)
 target_link_libraries(AC7RumbleTrace PRIVATE minhook)
 target_compile_options(AC7RumbleTrace PRIVATE /W4 /O2)
 set_target_properties(AC7RumbleTrace PROPERTIES PREFIX "" SUFFIX ".asi")

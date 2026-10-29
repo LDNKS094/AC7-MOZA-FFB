@@ -4,6 +4,7 @@
 #include <optional>
 #include <random>
 #include <vector>
+#include "settings.hpp"
 
 namespace ac7 {
 struct RumblePoint { float position; float amplitude; };
@@ -42,6 +43,7 @@ public:
     void StopAll();
     void Clear();
     void Tick(double delta, std::optional<AfterburnerInput> afterburner = std::nullopt);
+    void SetGains(const RumbleGains& gains) { gains_ = gains; }
     RumbleOutput Sample() const;
     std::optional<float> AfterburnerGain() const { return afterburner_gain_; }
 private:
@@ -55,6 +57,7 @@ private:
     std::vector<Effect> effects_;
     std::mt19937 random_;
     std::optional<float> afterburner_gain_;
+    RumbleGains gains_;
     bool paused_ = true;
     bool resuming_ = false;
 };

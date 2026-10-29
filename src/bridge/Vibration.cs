@@ -2,7 +2,6 @@
 using System; using System.Linq; using System.Collections.Generic; using System.Windows.Forms; using SharpDX.DirectInput;
 
 sealed class Vibration {
-  const double Gain = 1;
   DirectInput di;
   Form form;
   readonly List<Output> outputs = new();
@@ -24,9 +23,9 @@ sealed class Vibration {
 
     public void Close() {
       try { Effect?.Stop(); } catch (Exception ex) { Console.WriteLine($"[vib] stop failed on {Name}: {ex.Message}"); }
-      try { Effect?.Dispose(); } catch (Exception ex) { Console.WriteLine($"[vib] effect release on {Name}: {ex.Message}"); }
-      try { Joy?.Unacquire(); } catch (Exception ex) { Console.WriteLine($"[vib] unacquire on {Name}: {ex.Message}"); }
-      try { Joy?.Dispose(); } catch (Exception ex) { Console.WriteLine($"[vib] device release on {Name}: {ex.Message}"); }
+      try { Effect?.Dispose(); } catch (Exception ex) { Console.WriteLine($"[vib] effect release failed on {Name}: {ex.Message}"); }
+      try { Joy?.Unacquire(); } catch (Exception ex) { Console.WriteLine($"[vib] unacquire failed on {Name}: {ex.Message}"); }
+      try { Joy?.Dispose(); } catch (Exception ex) { Console.WriteLine($"[vib] device release failed on {Name}: {ex.Message}"); }
       Effect = null; Joy = null;
     }
   }
@@ -47,11 +46,11 @@ sealed class Vibration {
           output.Effect = new Effect(output.Joy, EffectGuid.Sine, output.Params(0, 50));
           output.Effect.Start(1);
           outputs.Add(output);
-          Console.WriteLine($"[vib] ready on {output.Name} ({output.Axes.Length} axes), gain {Gain}");
+          Console.WriteLine($"[vib] ready on {output.Name} ({output.Axes.Length} axes)");
         } catch (Exception ex) { Console.WriteLine($"[vib] init failed on {output.Name}: {ex.Message}"); }
         finally { if (!outputs.Contains(output)) output.Close(); }
       }
-    } catch (Exception ex) { Console.WriteLine("[vib] initialization failed: " + ex.Message); }
+    } catch (Exception ex) { Console.WriteLine("[vib] init failed: " + ex.Message); }
     if (!Ok) {
       Console.WriteLine("[vib] no available sine force-feedback output; Cockpit telemetry remains active");
       Close();
@@ -60,8 +59,8 @@ sealed class Vibration {
 
   public void UpdateRaw(double raw, int periodMs) {
     if (!Ok) return;
-    // Same native magnitude for every device; clip to the DirectInput range before gain1.
-    int mag = (int)(Math.Clamp(raw, 0, 1) * Gain * 10000);
+    // The ASI applies gains and selects the winner; clip only for the device range.
+    int mag = (int)(Math.Clamp(raw, 0, 1) * 10000);
     if (mag == 0) { Stop(); return; }
     if (mag == lastMag && periodMs == lastPeriod) return;
     bool restart = lastMag <= 0;

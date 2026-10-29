@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
+#include <limits>
 
 namespace ac7 {
 namespace {
@@ -132,12 +133,15 @@ void RumblePlayback::Clear() {
 RumbleOutput RumblePlayback::Sample() const {
     RumbleOutput result;
     result.paused = paused_ || resuming_;
-    if (result.paused) return result;
-    float value = 0;
+    if (result.paused || gains_.global == 0) return result;
+    double value = 0;
     for (const auto& effect : effects_) {
-        if (!effect.state.active) continue;
-        if (effect.state.value > value || (value > 0 && effect.state.value == value && effect.type < result.type)) {
-            value = effect.state.value;
+        if (!effect.state.active || effect.state.value <= 0 || gains_.effects[effect.type] == 0) continue;
+        double contribution = (static_cast<double>(effect.state.value) * gains_.global) * gains_.effects[effect.type];
+        // Huge finite settings saturate; the device range is clipped only after winner selection.
+        if (!std::isfinite(contribution)) contribution = std::numeric_limits<double>::max();
+        if (contribution > value || (value > 0 && contribution == value && effect.type < result.type)) {
+            value = contribution;
             result.type = effect.type; // Exact ties use the lowest type, independently of insertion order.
         }
     }

@@ -20,12 +20,7 @@ sealed class NativeRawFlight : IDisposable {
     pid = (uint)sourcePid;
     vibration = new Vibration();
     cancel = stopping.Token.Register(Stop);
-    Console.WriteLine($"[raw-flight] PID {pid}, classified carrier, gain1");
-    if (!vibration.Ok) {
-      Console.WriteLine("[raw-flight] device output unavailable; continuing Cockpit telemetry only");
-      return;
-    }
-    Console.WriteLine("[raw-flight] native classified effects; raw stale200ms or telemetry stale500ms stops; Ctrl+C exits");
+    if (!vibration.Ok) return;
     worker = new Thread(Poll) { IsBackground = true, Name = "AC7 raw rumble" };
     worker.Start();
   }
@@ -45,7 +40,11 @@ sealed class NativeRawFlight : IDisposable {
     try {
       while (!Done) {
         lock (gate) {
-          if (Done || !vibration.Ok) break;
+          if (Done) break;
+          if (!vibration.Ok) {
+            Console.WriteLine("[raw-flight] no device output left; rumble stopped, Cockpit telemetry remains active");
+            break;
+          }
           bool fresh = false;
           double raw = 0;
           int type = -1;
@@ -67,7 +66,7 @@ sealed class NativeRawFlight : IDisposable {
         stopping.Token.WaitHandle.WaitOne(10);
       }
     } catch (Exception ex) {
-      lock (gate) { vibration.Close(); }
+      Stop();
       Console.WriteLine("[raw-flight] receiver failed; raw rumble stopped, Cockpit telemetry remains active: " + ex.Message);
     } finally {
       Stop();
@@ -80,6 +79,6 @@ sealed class NativeRawFlight : IDisposable {
     worker?.Join();
     cancel.Dispose();
     vibration.Close();
-    Console.WriteLine("[raw-flight] stopped and device released");
+    Console.WriteLine("[raw-flight] stopped and devices released");
   }
 }

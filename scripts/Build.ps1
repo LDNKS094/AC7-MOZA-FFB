@@ -5,7 +5,7 @@ if (Get-Process DCS -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $
 $publish = Join-Path $root 'development\artifacts\bridge'
 & dotnet publish (Join-Path $root 'src\bridge\AceBridge.csproj') -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o $publish --verbosity minimal
 if ($LASTEXITCODE -ne 0) { throw 'Bridge publish failed.' }
-foreach ($module in @(@{Source = 'rumble'; File = 'AC7RumbleTrace.asi'}, @{Source = 'input'; File = 'AC7NativeInput.asi'})) {
+foreach ($module in @(@{Source = 'rumble'; File = 'AC7RumbleTrace.asi'}, @{Source = 'input'; File = 'AC7ExpandedInput.asi'})) {
     $source = Join-Path $root ('src\' + $module.Source)
     $build = Join-Path $root ('development\build\' + $module.Source)
     & cmake -S $source -B $build -A x64

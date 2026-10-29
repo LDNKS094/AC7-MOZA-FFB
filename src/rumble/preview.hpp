@@ -9,7 +9,7 @@ using PreviewOutput = void(*)(double, int, bool);
 // Owns independent native input copies and publishes the classified output.
 class RumblePreview {
 public:
-    void Initialize(PreviewOutput output);
+    void Initialize(PreviewOutput output, const RumbleGains& gains);
     void Notify(void* object, std::uint8_t type, const void* source, float scale);
     void Stop(void* object, std::uint8_t type);
     void Scale(void* object, std::uint8_t type, float scale);

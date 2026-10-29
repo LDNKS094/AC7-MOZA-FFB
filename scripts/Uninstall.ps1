@@ -18,7 +18,7 @@ if ($mapping -and $mapping.PSObject.Properties['AC7 Default'] -and $mapping.'AC7
 $mods = Join-Path $game 'ue4ss\Mods'
 $lists = Get-ModLists $mods $false
 if (-not $PSCmdlet.ShouldProcess($game, 'Remove AC7-MOZA-FFB game components and Cockpit preset')) { return }
-foreach ($name in @('AC7RumbleTrace.asi', 'AC7NativeInput.asi')) {
+foreach ($name in @('AC7RumbleTrace.asi', 'AC7ExpandedInput.asi', 'RumbleSettings.ini')) {
     $path = Join-Path $game $name
     if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path }
 }
