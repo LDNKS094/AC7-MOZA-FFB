@@ -1,6 +1,9 @@
-param([Parameter(Mandatory = $true)][ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._-]*$')][string]$Version)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+$project = [xml](Get-Content -LiteralPath (Join-Path $root 'src\bridge\AceBridge.csproj') -Raw)
+$Version = @($project.Project.PropertyGroup.Version | Where-Object { $_ })
+if ($Version.Count -ne 1 -or $Version[0] -notmatch '^\d+\.\d+\.\d+(?:\.\d+)?$') { throw 'Could not find a valid version in src\bridge\AceBridge.csproj.' }
+$Version = $Version[0]
 $stage = Join-Path $root ('development\artifacts\package-' + [guid]::NewGuid().ToString('N'))
 $releases = Join-Path $root 'releases'
 $zip = Join-Path $releases "AC7-MOZA-FFB-$Version.zip"
@@ -20,10 +23,6 @@ try {
             Copy-Item (Join-Path $root ('optional-logging\' + $name)) $logging.FullName
         }
     }
-    $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | ForEach-Object {
-        [ordered]@{path = $_.FullName.Substring($stage.Length + 1).Replace('\', '/'); bytes = $_.Length; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
-    })
-    @{version = $Version; files = $files} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $stage 'release.json') -Encoding UTF8
     Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip
     (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + (Split-Path -Leaf $zip) | Set-Content "$zip.sha256" -Encoding ASCII
     Write-Output "Packaged: $zip"

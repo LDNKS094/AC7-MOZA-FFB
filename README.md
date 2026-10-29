@@ -179,4 +179,4 @@ Once built, install the patch as usual.
 
 ## License
 
-Released under [GPL-3.0](LICENSE). Bundled third-party components keep their own licenses; their texts are in [licenses/](licenses/).
+Released under [GPL-3.0](LICENSE). Bundled third-party components keep their own licenses.
